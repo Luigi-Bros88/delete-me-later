@@ -49,6 +49,26 @@ jobs:
 
           cmake --build "%GITHUB_WORKSPACE%\aseprite\build" --target aseprite --parallel
           if errorlevel 1 exit /b 1
+
+      - name: Bundle OpenSSL runtime DLL
+        shell: pwsh
+        run: |
+          $searchRoots = @(
+            "C:\Strawberry",
+            "C:\Program Files\Git",
+            "C:\Program Files\OpenSSL-Win64"
+          ) | Where-Object { Test-Path $_ }
+
+          $dll = Get-ChildItem -Path $searchRoots `
+            -Filter "libcrypto-3-x64.dll" -Recurse -ErrorAction SilentlyContinue |
+            Select-Object -First 1
+
+          if (-not $dll) {
+            throw "libcrypto-3-x64.dll was not found on the runner."
+          }
+
+          Copy-Item $dll.FullName "$env:GITHUB_WORKSPACE\aseprite\build\bin\"
+          
       - name: Upload Finished Executable
         uses: actions/upload-artifact@v4
         with:

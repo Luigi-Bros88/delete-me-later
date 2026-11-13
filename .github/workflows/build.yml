@@ -33,12 +33,14 @@ jobs:
       - name: Clone Aseprite
         run: git clone --recursive https://github.com/aseprite/aseprite.git
 
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
       - name: Run CMake & Compile
         shell: cmd
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          if errorlevel 1 exit /b 1
-
           where cl
           if exist "%GITHUB_WORKSPACE%\aseprite\build" rmdir /s /q "%GITHUB_WORKSPACE%\aseprite\build"
 
@@ -47,7 +49,6 @@ jobs:
 
           cmake --build "%GITHUB_WORKSPACE%\aseprite\build" --target aseprite --parallel
           if errorlevel 1 exit /b 1
-
       - name: Upload Finished Executable
         uses: actions/upload-artifact@v4
         with:

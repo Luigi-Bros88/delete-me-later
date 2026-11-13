@@ -54,3 +54,4 @@ Common issues:
 ## License
 
 This repository is a build automation project. Please check upstream project licenses for Aseprite and Skia.
+The Aseprite EULA prohibits the distribution of binaries.

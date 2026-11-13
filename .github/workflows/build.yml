@@ -15,11 +15,20 @@ jobs:
         shell: pwsh
         run: |
           $url = "https://github.com/aseprite/skia/releases/download/m124-03a54b38bf/Skia-Windows-Release-x64.zip"
-          curl.exe -fL $url -o skia.zip
-          if ((Get-Item skia.zip).Length -lt 1000000) {
-            throw "Skia download is unexpectedly small; check the release URL and asset name."
+          $out = Join-Path $env:GITHUB_WORKSPACE "skia.zip"
+
+          curl.exe -fL "$url" -o "$out"
+
+          if (-not (Test-Path $out)) {
+            throw "Skia zip was not downloaded."
           }
-          7z x skia.zip "-o$env:GITHUB_WORKSPACE\skia"
+
+          if ((Get-Item $out).Length -lt 1000000) {
+            throw "Downloaded Skia zip is suspiciously small; URL may be invalid or asset removed."
+          }
+
+          $skia = Join-Path $env:GITHUB_WORKSPACE "skia"
+          7z x "$out" "-o$skia"
 
       - name: Clone Aseprite
         run: git clone --recursive https://github.com/aseprite/aseprite.git
